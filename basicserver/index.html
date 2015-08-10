@@ -2,6 +2,9 @@
 <html>
   <head>
     <title>Socket.IO chat</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<!-- Bootstrap -->
+	<link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
     <style>
       * { margin: 0; padding: 0; box-sizing: border-box; }
       body { font: 13px Helvetica, Arial; }
@@ -14,11 +17,13 @@
     </style>
 	<script src="/socket.io/socket.io.js"></script>
 	<script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
-	<script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+	<script src="http://code.jquery.com/jquery.js"></script>
+    <script src="js/bootstrap.min.js"></script>
 	<script>
 		$( document ).ready(function() {
 			console.log( "ready!" );
 			var socket = io();
+			var myteam;
 			$('#btn').click(function( event ) {
 				socket.emit('pushbutton', $('#m').val());
 			});
@@ -27,7 +32,19 @@
 				$('#messages').html('')
 				for(var k in msg){
 					console.log(k, msg[k]);
-					$('#messages').append($('<li>').text(k.substring(0, 10) + ' ========== ' + msg[k])); }
+					$('#messages').append($('<li>').text(k.substring(0, 10) + ' ====' + msg[k].team +'==== ' + msg[k].n)); }
+			});
+			socket.on('myteam', function(msg){
+				myteam = msg;
+				if(myteam == 'A')
+					$('#btn').removeClass('btn-default').addClass('btn-danger');
+				else
+					$('#btn').removeClass('btn-default').addClass('btn-info');
+			});
+
+			socket.on('status', function(msg){
+				console.log(msg);
+				$('#txt').text('teamA: ' + msg.A + ' vs. teamB: ' + msg.B);
 			});
 /*
 			$('form').submit(function(){
@@ -40,7 +57,8 @@
 	</script>
   </head>
   <body>
-	<button id='btn' style='width:300px;height:200px;font-size=60px;'>Send</button>
+	<button id='btn' class='btn btn-default'>Send</button>
+	<label id='txt'></label>
 	<br />
     <ul id="messages"></ul>
   </body>
