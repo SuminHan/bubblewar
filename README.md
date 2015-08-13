@@ -2,9 +2,9 @@
 Bubblewar is on development.
 
 ## Documents
-[Sprintplan]('Sprint1Plan.pdf')
-[Releaseplan]('ReleasePlan.pdf')
-[ProjectReleasePlanPPT]('ProjectReleasePlanPPT.pdf')
+* [Sprintplan](Sprint1Plan.pdf)
+* [Releaseplan](ReleasePlan.pdf)
+* [ProjectReleasePlanPPT](ProjectReleasePlanPPT.pdf)
 
 ### Installation
 
