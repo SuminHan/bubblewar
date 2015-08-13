@@ -38,9 +38,17 @@ Physics(function(world){
     vy: 0.01, // velocity in y-direction
     radius: 15
   });
+  var ball3 = Physics.body('circle', {
+    x: 250, // x-coordinate
+    y: 30, // y-coordinate
+    vx: 0.2, // velocity in x-direction
+    vy: -0.4, // velocity in y-direction
+    radius: 30
+  });
   // add the circle to the world
   world.add( ball1 );
   world.add( ball2 );
+  world.add( ball3 );
 
   // render on each step
   world.on('step', function(){
@@ -62,7 +70,7 @@ Physics(function(world){
   world.add( Physics.behavior('body-collision-detection'));
 
   // add some gravity
-  world.add( Physics.behavior('constant-acceleration') );
+  //world.add( Physics.behavior('constant-acceleration'));
 
   // subscribe to ticker to advance the simulation
   Physics.util.ticker.on(function( time, dt ){
