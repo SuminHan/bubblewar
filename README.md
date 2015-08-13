@@ -1,6 +1,19 @@
 # Bubblewar
 Bubblewar is on development.
 
+## Documents
+[Sprintplan]('Sprint1Plan.pdf')
+[Releaseplan]('ReleasePlan.pdf')
+[ProjectReleasePlanPPT]('ProjectReleasePlanPPT.pdf')
+
+### Installation
+
+You need to install before use the each application.
+
+```sh
+$ npm install
+```
+
 ### Version
 0.0.0
 
