@@ -31,8 +31,15 @@
 			var socket = io();
 			var myteam;
 			$('#btn').click(function( event ) {
-				socket.emit('pushbutton', $('#m').val());
+				socket.emit('pushbutton', '');
 			});
+
+			$(document).on('keyup', function( event ) {
+				var key = event.which || event.keyCode;
+				if(key == '32')
+					socket.emit('pushbutton', $('#m').val());
+			});
+
 			socket.on('pushedbutton', function(msg){
 				console.log(msg);
 				$('#messages').html('')
@@ -63,12 +70,17 @@
 	</script>
   </head>
   <body>
-  	<canvas id='viewport' style='background:blue;width=100%;height=800px!important;'></canvas>
-  	<br />
-	<button id='btn' class='btn btn-default'>Send</button>
-	<label id='txt'></label>
-	<br />
-    <ul id="messages"></ul>
+  	<div style="width:100%;height:100%;position:fixed;">
+		<div style='position:fixed;height:100%;'>
+		  	<div style='width:500px;height:300px;'>
+		  		<canvas id='viewport' tabindex='1' style='background:blue;'></canvas>
+		  	</div>
+		<div style='position:fixed;top:0;width:400px;right:0%;border-width:3px;height:100%;border-style:solid;'>
+		  	<button id='btn' class='btn btn-default'>Send</button>
+			<label id='txt'></label>
+		    <ul id="messages" style="position:fixed;width:360px;height:90%;overflow-y:scroll;"></ul>
+		</div>
+	</div>
 
 
     <script src="page.js"></script>

@@ -22,6 +22,26 @@ Physics(function(world){
 
   // add the renderer
   world.add( renderer );
+
+  var ball1 = Physics.body('circle', {
+    x: 450, // x-coordinate
+    y: 30, // y-coordinate
+    vx: -0.5, // velocity in x-direction
+    vy: 0.01, // velocity in y-direction
+    radius: 20,
+
+  });
+  var ball2 = Physics.body('circle', {
+    x: 50, // x-coordinate
+    y: 30, // y-coordinate
+    vx: 0.7, // velocity in x-direction
+    vy: 0.01, // velocity in y-direction
+    radius: 15
+  });
+  // add the circle to the world
+  world.add( ball1 );
+  world.add( ball2 );
+
   // render on each step
   world.on('step', function(){
     world.render();
@@ -33,23 +53,13 @@ Physics(function(world){
   // constrain objects to these bounds
   world.add(Physics.behavior('edge-collision-detection', {
       aabb: viewportBounds,
-      restitution: 0.99,
-      cof: 0.99
+      restitution: 0.8,
+      cof: 0.8
   }));
 
-  // add a circle
-  world.add(
-      Physics.body('circle', {
-        x: 50, // x-coordinate
-        y: 30, // y-coordinate
-        vx: 0.2, // velocity in x-direction
-        vy: 0.01, // velocity in y-direction
-        radius: 20
-      })
-  );
-
   // ensure objects bounce when edge collision is detected
-  world.add( Physics.behavior('body-impulse-response') );
+  world.add( Physics.behavior('body-impulse-response'));
+  world.add( Physics.behavior('body-collision-detection'));
 
   // add some gravity
   world.add( Physics.behavior('constant-acceleration') );

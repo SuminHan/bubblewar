@@ -7460,7 +7460,7 @@ Physics.behavior('body-collision-detection', function( parent ){
 
         // channel to listen to for collision candidates
         // set to "true" to force check every pair of bodies in the world
-        check: 'collisions:candidates',
+        check: true,
 
         // channel to publish events to
         channel: 'collisions:detected'
