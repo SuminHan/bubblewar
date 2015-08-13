@@ -2,9 +2,9 @@
 Bubblewar is on development.
 
 ## Documents
-* [Sprintplan](Sprint1Plan.pdf)
-* [Releaseplan](ReleasePlan.pdf)
-* [ProjectReleasePlanPPT](ProjectReleasePlanPPT.pdf)
+* [Sprintplan](Sprint1Plan.pdf) - 20150806
+* [Releaseplan](ReleasePlan.pdf) - 20150806
+* [ProjectReleasePlanPPT](ProjectReleasePlanPPT.pdf) - 20150806
 
 ### Installation
 
