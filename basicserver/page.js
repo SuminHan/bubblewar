@@ -1,6 +1,11 @@
 
 $( document ).ready(function() {
   console.log( "ready!" );
+  var world = Physics();
+  var viewWidth = 1000;
+  var viewHeight = 600;
+  var x = document.getElementById("viewport");
+
   var socket = io();
   var myteam;
   $('#btn').click(function( event ) {
@@ -14,7 +19,7 @@ $( document ).ready(function() {
       socket.emit('pushbutton', $('#m').val());
   });
 
-  socket.on('pushedbutton', function(msg){
+  socket.on('new ball', function(a){
     world.add(
       Physics.body('circle', {
         x: 0, // x-coordinate
@@ -22,13 +27,17 @@ $( document ).ready(function() {
         vx: 0.1, // velocity in x-direction
         vy: 0.1, // velocity in y-direction
         radius: 10
-      }) );
+      }));
+  });
+
+  socket.on('pushedbutton', function(msg){
 
     console.log(msg);
     $('#messages').html('')
     for(var k in msg){
       $('#messages').append($('<li>').text(k.substring(0, 10) + ' ====' + msg[k].team +'==== ' + msg[k].n)); }
   });
+
   socket.on('myteam', function(msg){
     myteam = msg;
     if(myteam == 'A')
@@ -41,11 +50,6 @@ $( document ).ready(function() {
     console.log(msg);
     $('#txt').text('teamA: ' + msg.A + ' vs. teamB: ' + msg.B);
   });
-
-  var world = Physics();
-  var viewWidth = 1000;
-  var viewHeight = 600;
-  var x = document.getElementById("viewport");
 
   var renderer = Physics.renderer('canvas', {
     el: x,

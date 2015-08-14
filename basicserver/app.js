@@ -48,6 +48,8 @@ io.on('connection', function(socket){
 		console.log('pushed button from ' + socket.id);
 		io.emit('pushedbutton', user);
 		io.emit('status', {A:pushA, B:pushB});
+		if(pushA%10 === 0 || pushB%10 === 0)
+			io.emit('new ball', 'test');
 	});
 	io.emit('some event', { for: 'everyone' });
 });
