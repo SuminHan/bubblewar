@@ -22,57 +22,16 @@
     <script src="js/physicsjs-full.js"></script>
     <script src="js/dom.js"></script>
 	<script src="js/debug.js"></script>
+    <script src="page.js"></script>
 
 
 
-	<script>
-		$( document ).ready(function() {
-			console.log( "ready!" );
-			var socket = io();
-			var myteam;
-			$('#btn').click(function( event ) {
-				socket.emit('pushbutton', '');
-			});
 
-			$(document).on('keyup', function( event ) {
-				var key = event.which || event.keyCode;
-				if(key == '32')
-					socket.emit('pushbutton', $('#m').val());
-			});
-
-			socket.on('pushedbutton', function(msg){
-				console.log(msg);
-				$('#messages').html('')
-				for(var k in msg){
-					console.log(k, msg[k]);
-					$('#messages').append($('<li>').text(k.substring(0, 10) + ' ====' + msg[k].team +'==== ' + msg[k].n)); }
-			});
-			socket.on('myteam', function(msg){
-				myteam = msg;
-				if(myteam == 'A')
-					$('#btn').removeClass('btn-default').addClass('btn-danger');
-				else
-					$('#btn').removeClass('btn-default').addClass('btn-info');
-			});
-
-			socket.on('status', function(msg){
-				console.log(msg);
-				$('#txt').text('teamA: ' + msg.A + ' vs. teamB: ' + msg.B);
-			});
-/*
-			$('form').submit(function(){
-				socket.emit('chat message', $('#m').val());
-				$('#m').val('');
-				return false;
-			});
-*/
-		});
-	</script>
   </head>
   <body>
   	<div style="width:100%;height:100%;position:fixed;">
 		<div style='position:fixed;height:100%;'>
-		  	<div style='width:500px;height:300px;'>
+		  	<div style='width:1000px;height:600px;'>
 		  		<canvas id='viewport' tabindex='1' style='background:blue;'></canvas>
 		  	</div>
 		<div style='position:fixed;top:0;width:400px;right:0%;border-width:3px;height:100%;border-style:solid;'>
@@ -81,8 +40,5 @@
 		    <ul id="messages" style="position:fixed;width:360px;height:90%;overflow-y:scroll;"></ul>
 		</div>
 	</div>
-
-
-    <script src="page.js"></script>
   </body>
 </html>
