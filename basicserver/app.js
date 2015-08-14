@@ -48,9 +48,14 @@ io.on('connection', function(socket){
 		console.log('pushed button from ' + socket.id);
 		io.emit('pushedbutton', user);
 		io.emit('status', {A:pushA, B:pushB});
-		if(pushA%10 === 1 || pushB%10 === 1){
+		if(pushA%11 === 0){
+			pushA ++;
 			console.log('new ball');
-			io.emit('new ball', 'test');
+			io.emit('new ball', 'A');
+		}else if (pushB%11 === 0){
+			pushB ++;
+			console.log('new ball');
+			io.emit('new ball', 'B');
 		}
 	});
 	io.emit('some event', { for: 'everyone' });

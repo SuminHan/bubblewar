@@ -21,7 +21,14 @@ $( document ).ready(function() {
 
   socket.on('new ball', function(a){
     world.add(
-      Physics.body('circle', {
+      Physics.body('convex-polygon', {
+		vertices: [
+				{ x: 0, y: -30 },
+				{ x: -29, y: -9 },
+				{ x: -18, y: 24 },
+				{ x: 18, y: 24 },
+				{ x: 29, y: -9 }
+			],
         x: 0, // x-coordinate
         y: 0, // y-coordinate
         vx: 0.1, // velocity in x-direction
@@ -61,9 +68,15 @@ $( document ).ready(function() {
         'circle' : {
             strokeStyle: '#351024',
             lineWidth: 1,
-            fillStyle: '#d33682',
+            fillStyle: '#00ffff',
             angleIndicator: '#351024'
-        }
+        },
+		'convex-polygon' : {
+		   strokeStyle: '#542437',
+		   lineWidth: 1,
+		   fillStyle: '#ffff00',
+		   angleIndicator: 'white'
+	    }
     }
   });
 
