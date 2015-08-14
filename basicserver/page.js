@@ -3,8 +3,9 @@ $( document ).ready(function() {
   console.log( "ready!" );
   var world = Physics();
   var viewWidth = 1000;
-  var viewHeight = 600;
+  var viewHeight = 100;
   var x = document.getElementById("viewport");
+  var r = 10;
 
   var socket = io();
   var myteam;
@@ -20,8 +21,9 @@ $( document ).ready(function() {
   });
 
   socket.on('new ball', function(a){
+	if(a === 'A'){
     world.add(
-      Physics.body('convex-polygon', {
+      Physics.body('circle', {
 		vertices: [
 				{ x: 0, y: -30 },
 				{ x: -29, y: -9 },
@@ -31,10 +33,41 @@ $( document ).ready(function() {
 			],
         x: 0, // x-coordinate
         y: 0, // y-coordinate
-        vx: 0.1, // velocity in x-direction
+        vx: 1.0, // velocity in x-direction
         vy: 0.1, // velocity in y-direction
-        radius: 10
+        radius: r,
+		styles:{
+            strokeStyle: '#351024',
+            lineWidth: 1,
+            fillStyle: '#ff0000',
+            angleIndicator: '#351024'
+		}
       }));
+	}
+	if(a === 'B'){
+    world.add(
+      Physics.body('circle', {
+		vertices: [
+				{ x: 0, y: -30 },
+				{ x: -29, y: -9 },
+				{ x: -18, y: 24 },
+				{ x: 18, y: 24 },
+				{ x: 29, y: -9 }
+			],
+        x: 1000, // x-coordinate
+        y: 0, // y-coordinate
+        vx: -1.0, // velocity in x-direction
+        vy: 0.1, // velocity in y-direction
+        radius: r,
+		styles:{
+            strokeStyle: '#351024',
+            lineWidth: 1,
+            fillStyle: '#00ff00',
+            angleIndicator: '#351024'
+		}
+      }));
+	}
+
   });
 
   socket.on('pushedbutton', function(msg){
@@ -120,6 +153,9 @@ $( document ).ready(function() {
   // ensure objects bounce when edge collision is detected
   world.add( Physics.behavior('body-impulse-response'));
   world.add( Physics.behavior('body-collision-detection'));
+  world.add(Physics.behavior('newtonian'));
+  //world.add(Physics.behavior('sweep-prune'));
+  //world.add(Physics.behavior('verlet-constraints'));
 
   // add some gravity
   //world.add( Physics.behavior('constant-acceleration'));
