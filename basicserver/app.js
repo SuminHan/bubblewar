@@ -2,6 +2,9 @@ var express = require('express');
 var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
+var Physics = require('./js/physicsjs-full');
+
+var world = Physics();
 
 user = {};
 teamA = 0;
@@ -21,14 +24,14 @@ io.on('connection', function(socket){
 		if(teamA>teamB){
 			user[socket.id] = {n:0, team:'B'};
 			teamB += 1;
-			io.emit('myteam', 'B');
+			io.emit('myteam-info', 'B');
 		}
 		else{
 			user[socket.id] = {n:0, team:'A'};
 			teamA += 1;
-			io.emit('myteam', 'A');
+			io.emit('myteam-info', 'A');
 		}
-		io.emit('pushedbutton', user);
+		io.emit('score-board', user);
 		io.emit('status', {A:pushA, B:pushB});
 	}
 	socket.on('disconnect', function(){
@@ -37,7 +40,7 @@ io.on('connection', function(socket){
 	socket.on('chat message', function(msg){
 		console.log('message: ' + msg);
 	});
-	socket.on('pushbutton', function(msg){
+	socket.on('client-pushed-button', function(msg){
 		user[socket.id].n += 1;
 		if(user[socket.id].team == 'A')	
 			pushA += 1;
@@ -46,19 +49,18 @@ io.on('connection', function(socket){
 
 		console.log(user);
 		console.log('pushed button from ' + socket.id);
-		io.emit('pushedbutton', user);
+		io.emit('score-board', user);
 		io.emit('status', {A:pushA, B:pushB});
 		if(pushA%11 === 0){
 			pushA ++;
-			console.log('new ball');
-			io.emit('new ball', 'A');
+			io.emit('ball-created', PHYSICS.ball);
 		}else if (pushB%11 === 0){
 			pushB ++;
-			console.log('new ball');
-			io.emit('new ball', 'B');
+			io.emit('ball-created', PHYSICS.ball);
 		}
 	});
 	io.emit('some event', { for: 'everyone' });
+
 });
 
 

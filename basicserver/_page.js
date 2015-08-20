@@ -14,46 +14,84 @@ $( document ).ready(function() {
   $(document).on('keypress', function( event ) {
     var key = event.which || event.keyCode;
     if(key == '32')
-      socket.emit('client-pushed-button', '');
+      socket.emit('pushbutton', '');
   });
 
   //server --> ball created
-  socket.on('ball-created', function(ball){
-	
-  });
-
-  //server --> score board (update)
-  socket.on('score-board', function(msg){
-    console.log(msg);
-    $('#messages').html('')
-    for(var k in msg){
-      $('#messages')
-	  .append($('<li>')
-	  .text(k.substring(0, 10)
-			+ ' ====' + msg[k].team +'==== '
-			+ msg[k].n));
+  socket.on('ball created', function(ball){
+	if(a === 'A'){
+    world.add(
+      Physics.body('circle', {
+		vertices: [
+				{ x: 0, y: -30 },
+				{ x: -29, y: -9 },
+				{ x: -18, y: 24 },
+				{ x: 18, y: 24 },
+				{ x: 29, y: -9 }
+			],
+        x: 0, // x-coordinate
+        y: 0, // y-coordinate
+        vx: 1.0, // velocity in x-direction
+        vy: 0.1, // velocity in y-direction
+        radius: r,
+		styles:{
+            strokeStyle: '#351024',
+            lineWidth: 1,
+            fillStyle: '#ff0000',
+            angleIndicator: '#351024'
+		}
+      }));
+	}
+	if(a === 'B'){
+    world.add(
+      Physics.body('circle', {
+		vertices: [
+				{ x: 0, y: -30 },
+				{ x: -29, y: -9 },
+				{ x: -18, y: 24 },
+				{ x: 18, y: 24 },
+				{ x: 29, y: -9 }
+			],
+        x: 1000, // x-coordinate
+        y: 0, // y-coordinate
+        vx: -1.0, // velocity in x-direction
+        vy: 0.1, // velocity in y-direction
+        radius: r,
+		styles:{
+            strokeStyle: '#351024',
+            lineWidth: 1,
+            fillStyle: '#00ff00',
+            angleIndicator: '#351024'
+		}
+      }));
 	}
   });
 
-  //server --> status (update)
-  socket.on('status', function(msg){
+  socket.on('pushedbutton', function(msg){
     console.log(msg);
-    $('#txt').text('teamA: ' + msg.A + ' vs. teamB: ' + msg.B);
+    $('#messages').html('')
+    for(var k in msg){
+      $('#messages').append($('<li>').text(k.substring(0, 10) + ' ====' + msg[k].team +'==== ' + msg[k].n)); }
   });
 
-  //server --> myteam-info
-  socket.on('myteam-info', function(info){
-    if(info == 'A')
+  socket.on('myteam', function(msg){
+    myteam = msg;
+    if(myteam == 'A')
       $('#btn').removeClass('btn-default').addClass('btn-danger');
     else
       $('#btn').removeClass('btn-default').addClass('btn-info');
   });
 
+  socket.on('status', function(msg){
+    console.log(msg);
+    $('#txt').text('teamA: ' + msg.A + ' vs. teamB: ' + msg.B);
+  });
 
   var renderer = Physics.renderer('canvas', {
     el: viewport_el,
     width: viewWidth,
     height: viewHeight,
+    meta: false, // don't display meta data
     styles: {
         // set colors for the circle bodies
         'circle' : {
@@ -113,7 +151,6 @@ $( document ).ready(function() {
   world.add( Physics.behavior('body-collision-detection'));
   world.add(Physics.behavior('newtonian'));
   //world.add(Physics.behavior('sweep-prune'));
-  //world.add(Physics.behavior('verlet-constraints'));
 
   // add some gravity
   //world.add( Physics.behavior('constant-acceleration'));
