@@ -20,6 +20,7 @@ $( document ).ready(function() {
   });
 
   socket.on('new ball', function(a){
+
 	if(a === 'A'){
     world.add(
       Physics.body('circle', {
@@ -34,12 +35,12 @@ $( document ).ready(function() {
                 fillStyle: '#ff0000',
                 angleIndicator: '#351024'
     		}
-      }));
+      })
+    );
 	}
 	if(a === 'B'){
     world.add(
       Physics.body('circle', {
-
         x: 250, // x-coordinate
         y: 500, // y-coordinate
         vx: -0.15, // velocity in x-direction
@@ -51,7 +52,8 @@ $( document ).ready(function() {
                 fillStyle: '#00ff00',
                 angleIndicator: '#351024'
     		}
-      }));
+      })
+    );
 	}
 
   });
@@ -79,37 +81,32 @@ $( document ).ready(function() {
 
 
 
-
-
-
 // create a behavior to handle pin constraints
 Physics.behavior('pin-constraints', function( parent ){
-    return {
-        init: function( opts ){
-            parent.init.call( this, opts );
-            this.pins = [];
-        },
-        
-        add: function( body, targetPos ){
-            this.pins.push({
-                body: body,
-                target: Physics.vector( targetPos )
-            });
-        },
-        
-        behave: function( data ){
-            
-            var pins = this.pins
-                ,pin
-                ;
-            
-            for (var i = 0, l = pins.length; i < l; i++){
-                pin = pins[ i ];
-                // move body to correct position
-                pin.body.state.pos.clone( pin.target );
-            }
-        }
-    };
+  return {
+    init: function( opts ){
+      parent.init.call( this, opts );
+      this.pins = [];
+    },
+    
+    add: function( body, targetPos ){
+      this.pins.push({
+        body: body,
+        target: Physics.vector( targetPos )
+      });
+    },
+    
+    behave: function( data ){
+      var pins = this.pins
+        ,pin
+        ;
+      for (var i = 0, l = pins.length; i < l; i++){
+        pin = pins[ i ];
+        // move body to correct position
+        pin.body.state.pos.clone( pin.target );
+      }
+    }
+  };
 });
 
 var renderer = Physics.renderer('canvas', {
@@ -135,26 +132,18 @@ var renderer = Physics.renderer('canvas', {
         */
     }
   });
-
   // add the renderer
   world.add( renderer );
 
   var shelf = Physics.body('convex-polygon', {
       x: 250,
       y: 250,
-      vertices: [{
-          x: -50,
-          y: -50
-      }, {
-          x: 50,
-          y: -50
-      }, {
-          x: 50,
-          y: 50
-      }, {
-          x: -50,
-          y: 50
-      }],
+      vertices: [
+      { x: -50, y: -50 },
+      { x: 50, y: -50 },
+      { x: 50, y: 50 },
+      { x: -50, y: 50 }
+      ],
       mass: 100,
       restitution: 0.5
   });
@@ -170,7 +159,7 @@ var renderer = Physics.renderer('canvas', {
   pinConstraints.add( shelf, shelf.state.pos );
   world.add(pinConstraints);
 
-  world.add(Physics.behavior('constant-acceleration'));
+  //world.add(Physics.behavior('constant-acceleration'));
   world.add(Physics.behavior('body-collision-detection'));
   world.add(Physics.behavior('body-impulse-response'));
   //world.add(Physics.behavior('sweep-prune'));
@@ -179,7 +168,8 @@ var renderer = Physics.renderer('canvas', {
 
   world.add(Physics.behavior('edge-collision-detection', {
       aabb: bounds,
-      restitution: 0.01
+      restitution: 0.01,
+      cof: 0.8
   }));
 
   // render on each step

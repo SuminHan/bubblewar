@@ -1,10 +1,10 @@
 <!doctype html>
 <html>
   <head>
-  <title>Socket.IO chat</title>
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<!-- Bootstrap -->
-	<link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
+    <title>Socket.IO chat</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Bootstrap -->
+    <link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
     <style>
       * { margin: 0; padding: 0; box-sizing: border-box; }
       body { font: 13px Helvetica, Arial; }
@@ -15,30 +15,27 @@
       #messages li { padding: 5px 10px; }
       #messages li:nth-child(odd) { background: #eee; }
     </style>
-	<script src="/socket.io/socket.io.js"></script>
-	<script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
-	<script src="http://code.jquery.com/jquery.js"></script>
-  <script src="js/bootstrap.min.js"></script>
-  <script src="js/physicsjs-full.js"></script>
-  <script src="js/dom.js"></script>
-	<script src="js/debug.js"></script>
-  <script src="page.js"></script>
-
-
-
-
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
+    <script src="http://code.jquery.com/jquery.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/physicsjs-full.js"></script>
+    <script src="js/dom.js"></script>
+    <script src="js/debug.js"></script>
+    <script src="page.js"></script>
   </head>
   <body>
   	<div style="width:100%;height:100%;position:fixed;">
-		<div style='position:fixed;height:100%;'>
-  		<div style='width:500px;height:500px;'>
-  		  <canvas id='viewport' tabindex='1' style='background:blue;'></canvas>
-  		</div>
-  		<div style='position:fixed;top:0;width:400px;right:0%;border-width:3px;height:100%;border-style:solid;'>
-  		  <button id='btn' class='btn btn-default'>Send</button>
-  			<label id='txt'></label>
-  		  <ul id="messages" style="position:fixed;width:360px;height:90%;overflow-y:scroll;"></ul>
-  		</div>
-	</div>
+  		<div style='position:fixed;height:100%;'>
+    		<div style='width:500px;height:500px;'>
+    		  <canvas id='viewport' tabindex='1' style='background:blue;'></canvas>
+    		</div>
+    		<div style='position:fixed;top:0;width:400px;right:0%;border-width:3px;height:100%;border-style:solid;'>
+    		  <button id='btn' class='btn btn-default'>Send</button>
+    			<label id='txt'></label>
+    		  <ul id="messages" style="position:fixed;width:360px;height:90%;overflow-y:scroll;"></ul>
+    		</div>
+      </div>
+    </div>
   </body>
 </html>
