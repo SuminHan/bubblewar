@@ -1,20 +1,19 @@
-
 $( document ).ready(function() {
   console.log( "ready!" );
   var world = Physics();
-  var viewWidth = 1000;
-  var viewHeight = 100;
+  var viewWidth = 500;
+  var viewHeight = 500;
   var x = document.getElementById("viewport");
   var r = 10;
 
   var socket = io();
   var myteam;
+
   $('#btn').click(function( event ) {
     socket.emit('pushbutton', '');
   });
 
   $(document).on('keypress', function( event ) {
-    
     var key = event.which || event.keyCode;
     if(key == '32')
       socket.emit('pushbutton', $('#m').val());
@@ -24,54 +23,40 @@ $( document ).ready(function() {
 	if(a === 'A'){
     world.add(
       Physics.body('circle', {
-		vertices: [
-				{ x: 0, y: -30 },
-				{ x: -29, y: -9 },
-				{ x: -18, y: 24 },
-				{ x: 18, y: 24 },
-				{ x: 29, y: -9 }
-			],
-        x: 0, // x-coordinate
+        x: 250, // x-coordinate
         y: 0, // y-coordinate
-        vx: 1.0, // velocity in x-direction
-        vy: 0.1, // velocity in y-direction
+        vx: 0.15, // velocity in x-direction
+        vy: 1.0, // velocity in y-direction
         radius: r,
-		styles:{
-            strokeStyle: '#351024',
-            lineWidth: 1,
-            fillStyle: '#ff0000',
-            angleIndicator: '#351024'
-		}
+    		styles:{
+                strokeStyle: '#351024',
+                lineWidth: 1,
+                fillStyle: '#ff0000',
+                angleIndicator: '#351024'
+    		}
       }));
 	}
 	if(a === 'B'){
     world.add(
       Physics.body('circle', {
-		vertices: [
-				{ x: 0, y: -30 },
-				{ x: -29, y: -9 },
-				{ x: -18, y: 24 },
-				{ x: 18, y: 24 },
-				{ x: 29, y: -9 }
-			],
-        x: 1000, // x-coordinate
-        y: 0, // y-coordinate
-        vx: -1.0, // velocity in x-direction
-        vy: 0.1, // velocity in y-direction
+
+        x: 250, // x-coordinate
+        y: 500, // y-coordinate
+        vx: -0.15, // velocity in x-direction
+        vy: -1.0, // velocity in y-direction
         radius: r,
-		styles:{
-            strokeStyle: '#351024',
-            lineWidth: 1,
-            fillStyle: '#00ff00',
-            angleIndicator: '#351024'
-		}
+    		styles:{
+                strokeStyle: '#351024',
+                lineWidth: 1,
+                fillStyle: '#00ff00',
+                angleIndicator: '#351024'
+    		}
       }));
 	}
 
   });
 
   socket.on('pushedbutton', function(msg){
-
     console.log(msg);
     $('#messages').html('')
     for(var k in msg){
@@ -91,7 +76,43 @@ $( document ).ready(function() {
     $('#txt').text('teamA: ' + msg.A + ' vs. teamB: ' + msg.B);
   });
 
-  var renderer = Physics.renderer('canvas', {
+
+
+
+
+
+
+// create a behavior to handle pin constraints
+Physics.behavior('pin-constraints', function( parent ){
+    return {
+        init: function( opts ){
+            parent.init.call( this, opts );
+            this.pins = [];
+        },
+        
+        add: function( body, targetPos ){
+            this.pins.push({
+                body: body,
+                target: Physics.vector( targetPos )
+            });
+        },
+        
+        behave: function( data ){
+            
+            var pins = this.pins
+                ,pin
+                ;
+            
+            for (var i = 0, l = pins.length; i < l; i++){
+                pin = pins[ i ];
+                // move body to correct position
+                pin.body.state.pos.clone( pin.target );
+            }
+        }
+    };
+});
+
+var renderer = Physics.renderer('canvas', {
     el: x,
     width: viewWidth,
     height: viewHeight,
@@ -103,62 +124,68 @@ $( document ).ready(function() {
             lineWidth: 1,
             fillStyle: '#00ffff',
             angleIndicator: '#351024'
-        },
-		'convex-polygon' : {
-		   strokeStyle: '#542437',
-		   lineWidth: 1,
-		   fillStyle: '#ffff00',
-		   angleIndicator: 'white'
-	    }
+        }
+        /*
+        'convex-polygon' : {
+           strokeStyle: '#542437',
+           lineWidth: 1,
+           fillStyle: '#ffff00',
+           angleIndicator: 'white'
+        }
+        */
     }
   });
 
   // add the renderer
   world.add( renderer );
 
-  var ball1 = Physics.body('circle', {
-    x: 450, // x-coordinate
-    y: 30, // y-coordinate
-    vx: -0.5, // velocity in x-direction
-    vy: 0.01, // velocity in y-direction
-    radius: 20,
+  var shelf = Physics.body('convex-polygon', {
+      x: 250,
+      y: 250,
+      vertices: [{
+          x: -50,
+          y: -50
+      }, {
+          x: 50,
+          y: -50
+      }, {
+          x: 50,
+          y: 50
+      }, {
+          x: -50,
+          y: 50
+      }],
+      mass: 100,
+      restitution: 0.5
+  });
+  world.add(shelf);
 
-  });
-  var ball2 = Physics.body('circle', {
-    x: 50, // x-coordinate
-    y: 30, // y-coordinate
-    vx: 0.7, // velocity in x-direction
-    vy: 0.01, // velocity in y-direction
-    radius: 15
-  });
-  // add the circle to the world
-  world.add( ball1 );
-  world.add( ball2 );
+  world.add(Physics.integrator('verlet', {
+      drag: 0.003
+  }));
+  
+
+  var pinConstraints = Physics.behavior('pin-constraints');
+  // add a pin constraint constraining the shelf's center to its current position
+  pinConstraints.add( shelf, shelf.state.pos );
+  world.add(pinConstraints);
+
+  world.add(Physics.behavior('constant-acceleration'));
+  world.add(Physics.behavior('body-collision-detection'));
+  world.add(Physics.behavior('body-impulse-response'));
+  //world.add(Physics.behavior('sweep-prune'));
+
+  var bounds = Physics.aabb(0, 0, viewWidth, viewHeight);
+
+  world.add(Physics.behavior('edge-collision-detection', {
+      aabb: bounds,
+      restitution: 0.01
+  }));
 
   // render on each step
   world.on('step', function(){
     world.render();
   });
-
-  // bounds of the window
-  var viewportBounds = Physics.aabb(0, 0, viewWidth, viewHeight);
-
-  // constrain objects to these bounds
-  world.add(Physics.behavior('edge-collision-detection', {
-      aabb: viewportBounds,
-      restitution: 0.8,
-      cof: 0.8
-  }));
-
-  // ensure objects bounce when edge collision is detected
-  world.add( Physics.behavior('body-impulse-response'));
-  world.add( Physics.behavior('body-collision-detection'));
-  world.add(Physics.behavior('newtonian'));
-  //world.add(Physics.behavior('sweep-prune'));
-  //world.add(Physics.behavior('verlet-constraints'));
-
-  // add some gravity
-  //world.add( Physics.behavior('constant-acceleration'));
 
   // subscribe to ticker to advance the simulation
   Physics.util.ticker.on(function( time, dt ){

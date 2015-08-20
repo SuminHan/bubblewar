@@ -48,11 +48,11 @@ io.on('connection', function(socket){
 		console.log('pushed button from ' + socket.id);
 		io.emit('pushedbutton', user);
 		io.emit('status', {A:pushA, B:pushB});
-		if(pushA%11 === 0){
+		if(pushA%2 === 0){
 			pushA ++;
 			console.log('new ball');
 			io.emit('new ball', 'A');
-		}else if (pushB%11 === 0){
+		}else if (pushB%2 === 0){
 			pushB ++;
 			console.log('new ball');
 			io.emit('new ball', 'B');
