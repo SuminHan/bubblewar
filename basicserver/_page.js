@@ -151,6 +151,7 @@ $( document ).ready(function() {
   world.add( Physics.behavior('body-collision-detection'));
   world.add(Physics.behavior('newtonian'));
   //world.add(Physics.behavior('sweep-prune'));
+  //world.add(Physics.behavior('verlet-constraints'));
 
   // add some gravity
   //world.add( Physics.behavior('constant-acceleration'));

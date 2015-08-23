@@ -1,14 +1,17 @@
-$( document ).ready(function() {
+$(function() {
   console.log( "ready!" );
 
-  var world = Physics();
-  var viewWidth = 1000;
-  var viewHeight = 100;
+  var world = null;
   var viewport_el = document.getElementById("viewport");
   var r = 10;
 
   var socket = io();
   var myteam;
+
+  socket.on('load-world', function(bds){
+	world = Physics();
+	world.add(bds);
+  });
 
   //space bar signal --> server
   $(document).on('keypress', function( event ) {
@@ -54,6 +57,10 @@ $( document ).ready(function() {
     el: viewport_el,
     width: viewWidth,
     height: viewHeight,
+    meta: {
+		fps: 10,
+		ipf: 4
+	}, // don't display meta data
     styles: {
         // set colors for the circle bodies
         'circle' : {
@@ -74,56 +81,11 @@ $( document ).ready(function() {
   // add the renderer
   world.add( renderer );
 
-  var ball1 = Physics.body('circle', {
-    x: 450, // x-coordinate
-    y: 30, // y-coordinate
-    vx: -0.5, // velocity in x-direction
-    vy: 0.01, // velocity in y-direction
-    radius: 20,
-
-  });
-  var ball2 = Physics.body('circle', {
-    x: 50, // x-coordinate
-    y: 30, // y-coordinate
-    vx: 0.7, // velocity in x-direction
-    vy: 0.01, // velocity in y-direction
-    radius: 15
-  });
-  // add the circle to the world
-  world.add( ball1 );
-  world.add( ball2 );
 
   // render on each step
   world.on('step', function(){
     world.render();
   });
 
-  // bounds of the window
-  var viewportBounds = Physics.aabb(0, 0, viewWidth, viewHeight);
-
-  // constrain objects to these bounds
-  world.add(Physics.behavior('edge-collision-detection', {
-      aabb: viewportBounds,
-      restitution: 0.8,
-      cof: 0.8
-  }));
-
-  // ensure objects bounce when edge collision is detected
-  world.add( Physics.behavior('body-impulse-response'));
-  world.add( Physics.behavior('body-collision-detection'));
-  world.add(Physics.behavior('newtonian'));
-  //world.add(Physics.behavior('sweep-prune'));
-  //world.add(Physics.behavior('verlet-constraints'));
-
-  // add some gravity
-  //world.add( Physics.behavior('constant-acceleration'));
-
-  // subscribe to ticker to advance the simulation
-  Physics.util.ticker.on(function( time, dt ){
-      world.step( time );
-  });
-
-  // start the ticker
-  Physics.util.ticker.start();
 
 });

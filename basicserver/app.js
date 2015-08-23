@@ -4,13 +4,18 @@ var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var Physics = require('./js/physicsjs-full');
 
-var world = Physics();
+var viewWidth = 1000;
+var viewHeight = 100;
 
 user = {};
 teamA = 0;
 teamB = 0;
 pushA = 0;
 pushB = 0;
+
+http.listen(3000, function(){
+	console.log('listening on *:3000');
+});
 
 app.get('/', function(req, res){
 	//res.send('<h1>Hello world</h1>');
@@ -59,11 +64,52 @@ io.on('connection', function(socket){
 			io.emit('ball-created', PHYSICS.ball);
 		}
 	});
-	io.emit('some event', { for: 'everyone' });
 
+	//physics stuff
+	var sample = Physics();
+	var ball1 = Physics.body('circle', {
+		x: 450, // x-coordinate
+		y: 30, // y-coordinate
+		vx: -0.5, // velocity in x-direction
+		vy: 0.01, // velocity in y-direction
+		radius: 20,
+	});
+	var ball2 = Physics.body('circle', {
+		x: 50, // x-coordinate
+		y: 30, // y-coordinate
+		vx: 0.7, // velocity in x-direction
+		vy: 0.01, // velocity in y-direction
+		radius: 15
+	});
+	// add the circle to the world
+	sample.add( ball1 );
+	sample.add( ball2 );
+
+	// bounds of the window
+	var viewportBounds = Physics.aabb(0, 0, viewWidth, viewHeight);
+
+	// constrain objects to these bounds
+	sample.add(Physics.behavior('edge-collision-detection', {
+		aabb: viewportBounds,
+		restitution: 0.8,
+		cof: 0.8
+	}));
+
+	// ensure objects bounce when edge collision is detected
+	sample.add( Physics.behavior('body-impulse-response'));
+	sample.add( Physics.behavior('body-collision-detection'));
+	sample.add(Physics.behavior('newtonian'));
+
+	// subscribe to ticker to advance the simulation
+	Physics.util.ticker.on(function( time, dt ){
+		sample.step( time );
+	});
+
+	// start the ticker
+	Physics.util.ticker.start();
+	//io.emit('load-world', sample);
+	//io.emit('load-world', sample.getBodies());
+	
 });
 
 
-http.listen(3000, function(){
-	console.log('listening on *:3000');
-});
