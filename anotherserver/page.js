@@ -1,6 +1,61 @@
-$(function() {
-  console.log( "ready!" );
+$(function(){
+  var socket = io();
+  var stage = new PIXI.Container();
+  var renderer = PIXI.autoDetectRenderer(800, 600, {backgroundColor : 0x1099bb});
+  var oldData = null;
+  var newData = null;
+  var mygraphics = {};
+  $('#viewport').append(renderer.view);
 
+  requestAnimationFrame(animate);
+
+  socket.on('body-update', function(serverData){
+    newData = serverData;
+  });
+
+  function animate(){
+    updateBodyData();
+    requestAnimationFrame(animate);
+    renderer.render(stage);
+  }
+  function updateBodyData(){
+    oldData = newData;
+    for(var i in newData){
+      var d = newData[i];
+      var ngraphics = mygraphics[d.id];
+      if(!ngraphics){
+        ngraphics = new PIXI.Graphics();
+        mygraphics[d.id] = ngraphics;
+
+        if(d.team === 'A') ngraphics.beginFill(0xFFFF00);
+        else ngraphics.beginFill(0xFFFF00);
+        ngraphics.lineStyle(1, 0xFF0000);
+
+        if(d.type === 'circle'){          
+          ngraphics.drawCircle(0, 0, d.r);
+        }
+        else if(d.type === 'rect'){
+          ngraphics.drawRect(0, 0, d.w, d.h);
+        }
+        else{
+
+        }
+        stage.addChild(ngraphics);
+      }
+      //ngraphics.x = d.x;
+      //ngraphics.y = d.y;
+      TweenLite.to(ngraphics, 1, { x: d.x, y: d.y});
+      ngraphics.rotation = d.ang;
+    }
+  }
+
+
+});
+
+
+
+
+/**
   var world = null;
   var viewport_el = document.getElementById("viewport");
   var r = 10;
@@ -9,9 +64,10 @@ $(function() {
   var myteam;
 
   socket.on('load-world', function(bds){
-	world = Physics();
-	world.add(bds);
+  	world = Physics();
+  	world.add(bds);
   });
+
 
   //space bar signal --> server
   $(document).on('keypress', function( event ) {
@@ -89,3 +145,5 @@ $(function() {
 
 
 });
+
+**/
