@@ -5,7 +5,7 @@
 // game parameters
 var restURI = ""; // client may be pointed to remote service. ex."https://some.otherhost.com/"
 var maxVelocity = 10; // max translate distance per frame.
-var refresh = 150; // how often to get game state from the service in milliseconds.
+var refresh = 10; // how often to get game state from the service in milliseconds.
 
 // html5 web workers
 var networker = null;
@@ -50,6 +50,7 @@ $(function () {
     // PIXI scene setup
     stage = new PIXI.Stage(0x999999);
     renderer = PIXI.autoDetectRenderer($(window).width(), $(window).height());
+    //renderer = PIXI.autoDetectRenderer(1000, 100);
     $("body").append(renderer.view);
 
     // use center of stage as 0,0 point for coordinates
