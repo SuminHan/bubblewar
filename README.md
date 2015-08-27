@@ -2,6 +2,7 @@
 Bubblewar is on development.
 
 ## Documents
+* [FinalPresentation](Scrum_GoldmoonKaist.pdf) - 20150827
 * [Sprintplan](Sprint1Plan.pdf) - 20150806
 * [Releaseplan](ReleasePlan.pdf) - 20150806
 * [ProjectReleasePlanPPT](ProjectReleasePlanPPT.pdf) - 20150806
