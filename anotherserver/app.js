@@ -3,6 +3,8 @@ var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var Physics = require('./js/physicsjs-full');
+var FPS = 30;
+var userData = {};
 var sampleData = { 
 'xxx':
 {
@@ -52,6 +54,7 @@ app.get('/', function(req, res){res.sendFile(__dirname + '/index.html');});
 //Physics
 var viewWidth = 800;
 var viewHeight = 600;
+var today = new Date();
 // bounds of the window
 var viewportBounds = Physics.aabb(0, 0, viewWidth, viewHeight);
 var world = Physics();
@@ -73,7 +76,6 @@ var ball2 = Physics.body('circle', {
 world.add( ball1 );
 world.add( ball2 );
 
-
 // constrain objects to these bounds
 world.add(Physics.behavior('edge-collision-detection', {
 	aabb: viewportBounds,
@@ -84,9 +86,9 @@ world.add(Physics.behavior('edge-collision-detection', {
 // ensure objects bounce when edge collision is detected
 world.add( Physics.behavior('body-impulse-response'));
 world.add( Physics.behavior('body-collision-detection'));
-world.add( Physics.behavior('constant-acceleration'));
+//world.add( Physics.behavior('constant-acceleration'));
 
-//world.add(Physics.behavior('newtonian'));
+world.add(Physics.behavior('newtonian'));
 
 var ballList = [ball1, ball2];
 
@@ -98,14 +100,22 @@ world.on('step', function(){
 });
 
 
-
-
 /*** Socket.io IO-CONNECTION ***/
 io.on('connection', function(socket){
-
+	//io.emit('init-client', {fps: FPS});
+	io.sockets.connected[socket.id].emit('init-client', {fps: FPS});
 
 	socket.on('disconnect', function(){
 		console.log('user disconnected');
+		io.emit('user-data', userData);
+	});
+	socket.on('usermode', function(udata){
+		userData[socket.id] = {
+			mode: udata.mode,
+			name: udata.name,
+			time: new Date().toUTCString()
+		};
+		io.emit('user-data', userData);
 	});
 
 	//server --> ball created
@@ -122,11 +132,16 @@ io.on('connection', function(socket){
 		ballList.push(nb);
 		console.log('pushed-button!!');
 
+		if(!!io.sockets.connected[socket.id])
+			io.emit('user-data', userData);
+
+
 	});
 
 	setInterval(function(){
-		io.emit('body-update', sampleData);
-	}, 100);
+		if(!!io.sockets.connected[socket.id])
+			io.emit('body-update', sampleData);
+	}, 1000/FPS);
 
 /*
 	// subscribe to ticker to advance the simulation
@@ -153,21 +168,11 @@ function setData(e){
 		y: e.state.pos.y,
 		r: e.radius,
 		ang: 0,
-	}
+	};
 }
 
 setInterval(function(){
 	world.step();
-	for(var i in sampleData){
-		var d = sampleData[i];
-		/*
-		d.x += d.dir;
-		if(d.x > 400)
-			d.dir = -10;
-		else if(d.x < 200)
-			d.dir = 10;
-*/
-	}
 }, 1);
 
 
