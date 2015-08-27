@@ -6,6 +6,9 @@ $( document ).ready(function() {
   var x = document.getElementById("viewport");
   var r = 10;
 
+  var scoreA = 0;
+  var scoreB = 0;
+
   var socket = io();
   var myteam;
 
@@ -26,8 +29,8 @@ $( document ).ready(function() {
       Physics.body('circle', {
         x: 250, // x-coordinate
         y: 0, // y-coordinate
-        vx: 0.08, // velocity in x-direction
-        vy: 0.7, // velocity in y-direction
+        vx: 0.1, // velocity in x-direction
+        vy: 0.9, // velocity in y-direction
         radius: r,
     		styles:{
                 strokeStyle: '#351024',
@@ -43,8 +46,8 @@ $( document ).ready(function() {
       Physics.body('circle', {
         x: 250, // x-coordinate
         y: 500, // y-coordinate
-        vx: -0.08, // velocity in x-direction
-        vy: -0.7, // velocity in y-direction
+        vx: -0.1, // velocity in x-direction
+        vy: -0.9, // velocity in y-direction
         radius: r,
     		styles:{
                 strokeStyle: '#351024',
@@ -143,7 +146,8 @@ var renderer = Physics.renderer('canvas', {
       width: 100,
       height: 10,
 
-      mass: 0.1
+      mass: 0.1,
+      cof: 0.79
   });
 
   var edge2 = Physics.body('rectangle', {
@@ -153,7 +157,8 @@ var renderer = Physics.renderer('canvas', {
       width: 100,
       height: 10,
 
-      mass: 0.1
+      mass: 0.1,
+      cof: 0.81
   });
 
   var shelf = Physics.body('rectangle', {
@@ -216,33 +221,43 @@ var renderer = Physics.renderer('canvas', {
     world.render();
   });
 
-  /*
+  
   var first = true;
-  world.on('collisions:detected', function(data){
-    var cdata = data.collisions[0];
-    var cA = cdata.bodyA;
-    var cB = cdata.bodyB;
-    if((cA.name === 'circle' && cB.name === 'convex-polygon')){
 
-      if(first){ first = false;
-      }
+  world.on('collisions:detected', function(data){
+    
+    var cA = data.collisions[0].bodyA;
+    var cB = data.collisions[0].bodyB;
+    if((cA.name === 'circle' && cB.name === 'compound')){
+
+      if(first)
+        {
+          first = false;
+        }
       else{
-          //world.off('step');
+        if(cB.children[1].cof === 0.79)
+        {
+          scoreA += 1;          
+        }
+        else if (cB.children[2].cof === 0.81)
+        {
+          scoreB += 1;
+        }
       }
       xx = cA;
       yy = cB;
       dd = data.collisions[0];
+
       console.log({
-        Ax:cA.state.pos.x, 
-        Ay:cA.state.pos.y, 
-        Bx:cB.state.pos.x, 
-        By:cB.state.pos.y
+        collisionA: cA,
+        collisionB: cB,
+        scoreA:scoreA,
+        scoreB:scoreB
       });
     }
   
-    
   });
-  */
+  
 
   // subscribe to ticker to advance the simulation
   Physics.util.ticker.on(function( time, dt ){
@@ -255,4 +270,4 @@ var renderer = Physics.renderer('canvas', {
 
 });
 
-//var xx, yy, dd;
+var xx, yy, dd;
