@@ -1,16 +1,24 @@
 $(function(){
   var socket = io();
+
   var stage = new PIXI.Container();
   var renderer = PIXI.autoDetectRenderer(800, 600, {backgroundColor : 0x1099bb});
-  var oldData = null;
-  var newData = null;
+  var oldData = {};
+  var newData = {};
   var mygraphics = {};
   $('#viewport').append(renderer.view);
 
   requestAnimationFrame(animate);
 
   socket.on('body-update', function(serverData){
+    oldData = newData;
     newData = serverData;
+  });
+
+  $(document).on('keypress', function( event ) {
+    var key = event.which || event.keyCode;
+    if(key == '32')
+      socket.emit('client-pushed-button', '');
   });
 
   function animate(){
@@ -19,9 +27,15 @@ $(function(){
     renderer.render(stage);
   }
   function updateBodyData(){
-    oldData = newData;
     for(var i in newData){
       var d = newData[i];
+      var o = oldData[i];
+      if(!o){
+        o = {
+          x: 0,
+          y: 0
+        };
+      }
       var ngraphics = mygraphics[d.id];
       if(!ngraphics){
         ngraphics = new PIXI.Graphics();
@@ -44,9 +58,10 @@ $(function(){
       }
       //ngraphics.x = d.x;
       //ngraphics.y = d.y;
-      TweenLite.to(ngraphics, 1, { x: d.x, y: d.y});
+      TweenLite.fromTo(ngraphics, .1, { x: d.x, y: d.y}, {x: o.x, y: o.y});
       ngraphics.rotation = d.ang;
     }
+    oldData = newData;
   }
 
 

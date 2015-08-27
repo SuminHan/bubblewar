@@ -9,8 +9,8 @@ $(function() {
   var myteam;
 
   socket.on('load-world', function(bds){
-	world = Physics();
-	world.add(bds);
+  	world = Physics();
+  	world.add(bds);
   });
 
   //space bar signal --> server
@@ -35,7 +35,7 @@ $(function() {
 	  .text(k.substring(0, 10)
 			+ ' ====' + msg[k].team +'==== '
 			+ msg[k].n));
-	}
+	  }
   });
 
   //server --> status (update)
