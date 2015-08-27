@@ -50,8 +50,8 @@ $(function(){
       $('#userlist')
       .append($('<li>')
       .text(serverData[k].name
-        + ' ==== ' + serverData[k].mode
-        + ' ==time: ' + serverData[k].time));
+        + ': ' + serverData[k].mode
+        + ':time: ' + serverData[k].time));
     }
   });
 
@@ -61,7 +61,7 @@ $(function(){
   });
 
   $(document).on('keypress', function( event ) {
-    if(!started) return;
+    if(!started || userMode === 'attend') return;
     var key = event.which || event.keyCode;
     if(key == '32')
       socket.emit('client-pushed-button', '');
@@ -89,8 +89,9 @@ $(function(){
         mygraphics[d.id] = ngraphics;
 
         if(d.team === 'A') ngraphics.beginFill(0xFFFF00);
-        else ngraphics.beginFill(0xFFFF00);
-        ngraphics.lineStyle(1, 0xFF0000);
+        else ngraphics.beginFill(0xFF00FF);
+
+        ngraphics.lineStyle(1, 0xFFFFFF);
 
         if(d.type === 'circle'){          
           ngraphics.drawCircle(0, 0, d.r);

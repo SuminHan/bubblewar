@@ -5,40 +5,8 @@ var io = require('socket.io')(http);
 var Physics = require('./js/physicsjs-full');
 var FPS = 30;
 var userData = {};
-var sampleData = { 
-'xxx':
-{
-	id: 'xxx',
-	type: 'circle',
-	team: 'A',
-	x: 400,
-	y: 400,
-	r: 20,
-	ang: 0,
-	dir: 10
-},
-'yyy':{
-	id: 'yyy',
-	type: 'circle',
-	team: 'B',
-	x: 300,
-	y: 300,
-	r: 10,
-	ang: 0,
-	dir: 10
-},
-'zzz':{
-	id: 'zzz',
-	type: 'rect',
-	team: 'A',
-	x: 400,
-	y: 200,
-	w: 60,
-	h: 30,
-	ang: 3.14/3,
-	dir: 10,
-}
-};
+var sampleData = {};
+var ballList = {};
 //var game = require('./game.js');
 
 
@@ -58,23 +26,6 @@ var today = new Date();
 // bounds of the window
 var viewportBounds = Physics.aabb(0, 0, viewWidth, viewHeight);
 var world = Physics();
-var ball1 = Physics.body('circle', {
-	x: 450, // x-coordinate
-	y: 30, // y-coordinate
-	vx: -0.5, // velocity in x-direction
-	vy: 0.01, // velocity in y-direction
-	radius: 20,
-});
-var ball2 = Physics.body('circle', {
-	x: 50, // x-coordinate
-	y: 30, // y-coordinate
-	vx: 0.7, // velocity in x-direction
-	vy: 0.01, // velocity in y-direction
-	radius: 20
-});
-// add the circle to the world
-world.add( ball1 );
-world.add( ball2 );
 
 // constrain objects to these bounds
 world.add(Physics.behavior('edge-collision-detection', {
@@ -90,7 +41,6 @@ world.add( Physics.behavior('body-collision-detection'));
 
 world.add(Physics.behavior('newtonian'));
 
-var ballList = [ball1, ball2];
 
 world.on('step', function(){
 	//world.render();
@@ -100,19 +50,29 @@ world.on('step', function(){
 });
 
 
+var playerNum = 0;
 /*** Socket.io IO-CONNECTION ***/
 io.on('connection', function(socket){
+	playerNum ++;
 	//io.emit('init-client', {fps: FPS});
 	io.sockets.connected[socket.id].emit('init-client', {fps: FPS});
 
 	socket.on('disconnect', function(){
 		console.log('user disconnected');
+		playerNum --;
 		io.emit('user-data', userData);
 	});
 	socket.on('usermode', function(udata){
+		var tempTeam;
+		if(udata.mode === 'attend'){
+			tempTeam = 'none';
+		}
+		else if(playerNum%2 === 1) tempTeam = 'A';
+		else tempTeam = 'B';
 		userData[socket.id] = {
 			mode: udata.mode,
 			name: udata.name,
+			team: tempTeam,
 			time: new Date().toUTCString()
 		};
 		io.emit('user-data', userData);
@@ -129,7 +89,13 @@ io.on('connection', function(socket){
 		});
 		// add the circle to the world
 		world.add( nb );
-		ballList.push(nb);
+		ballList[nb.uid] = nb;
+		if(userData[socket.id].team === 'A'){
+			ballList[nb.uid].team = 'A';
+		}
+		else{
+			ballList[nb.uid].team = 'B';
+		}
 		console.log('pushed-button!!');
 
 		if(!!io.sockets.connected[socket.id])
@@ -163,7 +129,7 @@ function setData(e){
 	sampleData[e.uid] = {
 		id: e.uid,
 		type: 'circle',
-		team: 'A',
+		team: e.team,
 		x: e.state.pos.x,
 		y: e.state.pos.y,
 		r: e.radius,
