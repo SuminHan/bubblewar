@@ -5,6 +5,8 @@ $( document ).ready(function() {
   var viewHeight = 500;
   var x = document.getElementById("viewport");
   var r = 10;
+  var vxA = 0;
+  var vxB = 0;
 
   var scoreA = 0;
   var scoreB = 0;
@@ -21,6 +23,25 @@ $( document ).ready(function() {
     if(key == '32')
       socket.emit('pushbutton', $('#m').val());
   });
+  
+  $(document).on('keydown', function( event ) {
+    var key = event.which || event.keyCode;
+    if(key == '37') //left
+    {
+      vxA = vxA - 0.1;
+      vxB-=0.1;
+    }
+      
+  });
+
+  $(document).on('keydown', function( event ) {
+    var key = event.which || event.keyCode;
+    if(key == '39') //right
+    {
+      vxA = vxA + 0.1;
+      vxB+=0.1;
+    }
+  });
 
   socket.on('new ball', function(a){
 
@@ -28,8 +49,8 @@ $( document ).ready(function() {
     world.add(
       Physics.body('circle', {
         x: 250, // x-coordinate
-        y: 0, // y-coordinate
-        vx: 0.1, // velocity in x-direction
+        y: 10, // y-coordinate
+        vx: vxA, // velocity in x-direction
         vy: 0.9, // velocity in y-direction
         radius: r,
     		styles:{
@@ -45,8 +66,8 @@ $( document ).ready(function() {
     world.add(
       Physics.body('circle', {
         x: 250, // x-coordinate
-        y: 500, // y-coordinate
-        vx: -0.1, // velocity in x-direction
+        y: 490, // y-coordinate
+        vx: vxB, // velocity in x-direction
         vy: -0.9, // velocity in y-direction
         radius: r,
     		styles:{
@@ -125,20 +146,22 @@ var renderer = Physics.renderer('canvas', {
         lineWidth: 1,
         fillStyle: '#00ffff',
         angleIndicator: '#351024'
-      },
+      }
+      /*,
       'rectangle' : {
         strokeStyle: '#542437',
         lineWidth: 1,
         fillStyle: '#ffff00',
         angleIndicator: 'white'
       }
+      */
     }
 
   });
   // add the renderer
   world.add( renderer );
 
-
+/*
   var edge1 = Physics.body('rectangle', {
       x: 250,
       y: 195,
@@ -157,28 +180,31 @@ var renderer = Physics.renderer('canvas', {
       width: 100,
       height: 10,
 
+      styles:{
+        strokeStyle: '#351024',
+        lineWidth: 1,
+        fillStyle: '#ff00ff',
+        angleIndicator: '#351024'
+      },
+
       mass: 0.1,
       cof: 0.81
   });
-
-  var shelf = Physics.body('rectangle', {
+*/
+  var things = Physics.body('convex-polygon', {
       x: 250,
       y: 250,
-      
-      width: 100,
-      height: 100,
 
-      mass: 0.1
-      /*
+      mass: 0.1,
+      
       vertices: [
       { x: -50, y: -50 },
       { x: 50, y: -50 },
       { x: 50, y: 50 },
       { x: -50, y: 50 }
       ]
-      */
   });
-
+/*
   var things = Physics.body('compound', {
     x: 250,
     y: 250,
@@ -189,9 +215,16 @@ var renderer = Physics.renderer('canvas', {
       edge2
     ],
     
+    styles:{
+      strokeStyle: '#351024',
+      lineWidth: 1,
+      fillStyle: '#ffff00',
+      angleIndicator: '#351024'
+    },
+    
     mass: 1
   });
-
+*/
   world.add(things);
 
   world.add(Physics.integrator('verlet', {
@@ -228,29 +261,33 @@ var renderer = Physics.renderer('canvas', {
     
     var cA = data.collisions[0].bodyA;
     var cB = data.collisions[0].bodyB;
-    if((cA.name === 'circle' && cB.name === 'compound')){
+    var angleB = (cB.state.angular.pos / 3.14159265358979 * 180) % 360;
+    var sA = cA.styles.fillStyle;
+    //world.remove(cA);
+
+    if((cA.name === 'circle' && cB.name === 'convex-polygon')){
 
       if(first)
         {
           first = false;
         }
       else{
-        if(cB.children[1].cof === 0.79)
+
+        if((angleB>315 || angleB <45) && sA === "#00ff00")
         {
-          scoreA += 1;          
+          scoreB += 1;          
         }
-        else if (cB.children[2].cof === 0.81)
+        else if ((angleB>315 || angleB <45) && sA === "#ff0000")
         {
-          scoreB += 1;
+          scoreA += 1;
         }
+        //world.off('step');
       }
       xx = cA;
       yy = cB;
-      dd = data.collisions[0];
 
       console.log({
-        collisionA: cA,
-        collisionB: cB,
+        angularB: angleB,
         scoreA:scoreA,
         scoreB:scoreB
       });
@@ -270,4 +307,4 @@ var renderer = Physics.renderer('canvas', {
 
 });
 
-var xx, yy, dd;
+var xx, yy;
